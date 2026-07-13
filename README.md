@@ -1,5 +1,7 @@
 # DriftNet: Learn the Decision, Not the Transform
 
+[![DOI](https://zenodo.org/badge/1299566733.svg)](https://doi.org/10.5281/zenodo.21343024)
+
 Code for the paper **"Learn the Decision, Not the Transform: Localizing Where Machine Learning Helps in Narrowband Technosignature Search"** (Dubasi, submitted to *The Astronomical Journal*).
 
 The classical narrowband-SETI detector `turboSETI` computes an incoherent de-Doppler statistic and applies one hand-set threshold uniformly across observing bands. Rather than propose another detector, this work builds a modular one, **DriftNet**, that shares the same de-Doppler front end and ablates each design choice on **real Green Bank Telescope noise**, to localize where learning actually helps. The headline finding: making the de-Doppler kernels trainable adds nothing (McNemar p = 0.42), while replacing the hand-set threshold with a small learned decision rule over the same statistic is what helps, and that advantage transfers across bands.
@@ -51,7 +53,7 @@ python voyager_control.py            # curved detector on the real Voyager carri
 
 ## Citing
 
-Please cite both the paper and this software (see `CITATION.cff`). A Zenodo DOI is minted from the tagged GitHub release.
+Please cite both the paper and this software (see `CITATION.cff`). Software DOI (v1.0.0): [10.5281/zenodo.21343025](https://doi.org/10.5281/zenodo.21343025); concept DOI (latest): [10.5281/zenodo.21343024](https://doi.org/10.5281/zenodo.21343024).
 
 ## License
 
