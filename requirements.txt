@@ -1,0 +1,16 @@
+# DriftNet - pinned to the versions used in the paper.
+# numpy MUST be <2.0: blimpy/setigen break on numpy 2.x. Install numpy first if resolving fails.
+numpy<2.0
+scipy>=1.11.2
+scikit-learn
+matplotlib
+h5py
+hdf5plugin
+astropy<6
+blimpy
+setigen
+turbo_seti
+torch
+# optional: only needed for the cloud vision-language sanity check in vlm_eval.py (AWS Bedrock;
+# set the HF_TOKEN environment variable for the open-source VLM path).
+# boto3

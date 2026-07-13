@@ -1,0 +1,20 @@
+# public Breakthrough Listen data (downloaded by the run scripts) - never commit
+real_data/
+data/
+data_*/
+*.h5
+*.dat
+*.npy
+
+# generated outputs
+results/
+figs/
+*.png
+*.pdf
+
+# python
+__pycache__/
+*.pyc
+*.log
+.ipynb_checkpoints/
+.DS_Store

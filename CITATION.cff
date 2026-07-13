@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the paper and the software."
+title: "DriftNet: Learn the Decision, Not the Transform"
+abstract: >-
+  Code for the paper "Learn the Decision, Not the Transform: Localizing Where
+  Machine Learning Helps in Narrowband Technosignature Search." A modular
+  narrowband-SETI detector that shares turboSETI's de-Doppler front end and
+  ablates each design choice on real Green Bank Telescope noise.
+type: software
+authors:
+  - family-names: Dubasi
+    given-names: Pavan Kumar
+    orcid: "https://orcid.org/0009-0006-1060-4598"
+    affiliation: "VibeTensor"
+license: MIT
+keywords:
+  - SETI
+  - technosignatures
+  - de-Doppler
+  - machine learning
+  - Breakthrough Listen
+repository-code: "https://github.com/ascender1729/driftnet-seti"
