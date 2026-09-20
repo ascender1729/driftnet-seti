@@ -8,7 +8,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle, Polygon
 import matplotlib.colors as mcolors
-import os
+import os, sys
 os.makedirs("tex/figs", exist_ok=True)
 
 plt.rcParams.update({                                    # embed real fonts (no Type-3), muted look
@@ -163,30 +163,56 @@ def architecture():
 
 
 def concept():
-    rng = np.random.default_rng(0); T, F = 64, 256
+    # Revision 2 (AJ referee): panels stacked so each is drawn at its printed width (0.47\textwidth
+    # ~ 3.3 in) with 8-9.5 pt type; explicit ticks + labels on every axis; annotation +40% and
+    # colorblind-safe (Okabe-Ito orange, white marker with black halo on magma).
+    # ponytail: axes are in samples/channels; physical s / Hz need tsamp + foff, which this synthetic
+    # demo does not have.
+    import matplotlib.patheffects as pe
+    rng = np.random.default_rng(0); T, F = 64, 256; D_TRUE, F0 = 0.9, 70
     P = rng.chisquare(2, (T, F)).astype(float) * 3
     for t in range(T):                                   # a faint drifting line
-        f = 70 + int(0.9 * t); P[t, f:f + 2] += 6
+        f = F0 + int(round(D_TRUE * t)); P[t, f:f + 2] += 6    # round(), same as the transform below
     # de-Doppler over a drift grid
     drifts = np.linspace(-1.5, 1.5, 61); R = np.zeros((len(drifts), F))
     Pd = P - np.median(P, axis=0, keepdims=True)
     for k, d in enumerate(drifts):
         for t in range(T):
             R[k] += np.roll(Pd[t], -int(round(d * t)))
-    fig, ax = plt.subplots(1, 2, figsize=(8.5, 3.3))
-    ax[0].imshow(P, aspect="auto", cmap="gray", origin="lower"); ax[0].set_title("(a) dynamic spectrum (faint drift)", fontsize=9)
-    ax[0].set_xlabel("frequency"); ax[0].set_ylabel("time"); ax[0].set_xticks([]); ax[0].set_yticks([])
-    im = ax[1].imshow(R, aspect="auto", cmap="magma", origin="lower",
-                      extent=[0, F, drifts[0], drifts[-1]])
-    ax[1].set_title("(b) de-Doppler drift spectrum $R[d,f]$", fontsize=9)
-    ax[1].set_xlabel("frequency"); ax[1].set_ylabel("drift rate $d$"); ax[1].set_xticks([])
     ky, kx = np.unravel_index(R.argmax(), R.shape)
-    ax[1].plot(kx, drifts[ky], "o", mfc="none", mec="cyan", ms=12)
-    ax[1].text(kx + 10, drifts[ky], "matched-filter peak", fontsize=7.5, color="cyan", va="center")
-    plt.tight_layout(); plt.savefig("tex/figs/concept.png", dpi=300)
-    plt.savefig("tex/figs/concept.pdf"); plt.close()
+    assert abs(drifts[ky] - D_TRUE) < 0.03 and abs(kx - F0) <= 1, (drifts[ky], kx)  # peak must be the injected line
+
+    ORANGE = "#E69F00"; HALO = [pe.withStroke(linewidth=2.2, foreground="black")]
+    TICK, LAB, ANN, TAG = 8, 9, 9.5, 10
+    fig, ax = plt.subplots(2, 1, figsize=(3.5, 4.6))
+    # (a) dynamic spectrum, axes in samples / channels
+    ax[0].imshow(P, aspect="auto", cmap="gray", origin="lower", extent=[0, F, 0, T])
+    ax[0].set_xlabel("frequency channel", fontsize=LAB); ax[0].set_ylabel("time sample", fontsize=LAB)
+    ax[0].set_xticks(np.arange(0, F + 1, 64)); ax[0].set_yticks(np.arange(0, T + 1, 16))
+    tm = T // 2
+    ax[0].annotate(f"injected line\n$d={D_TRUE}$ ch / sample", xy=(F0 + D_TRUE * tm + 1, tm), xytext=(150, 20),
+                   fontsize=ANN, color=ORANGE, ha="left", va="center", path_effects=HALO,
+                   arrowprops=dict(arrowstyle="-|>", color=ORANGE, lw=1.4, shrinkA=2, shrinkB=2))
+    # (b) drift spectrum, drift axis in channels per sample
+    ax[1].imshow(R, aspect="auto", cmap="magma", origin="lower", extent=[0, F, drifts[0], drifts[-1]])
+    ax[1].set_xlabel("frequency channel", fontsize=LAB); ax[1].set_ylabel("drift rate $d$ [ch / sample]", fontsize=LAB)
+    ax[1].set_xticks(np.arange(0, F + 1, 64)); ax[1].set_yticks(np.arange(-1.5, 1.51, 0.5))
+    ax[1].plot(kx, drifts[ky], "o", mfc="none", mec="black", mew=3.2, ms=15)
+    ax[1].plot(kx, drifts[ky], "o", mfc="none", mec="white", mew=1.4, ms=15)
+    ax[1].annotate("matched-filter peak\n" + r"$\rho(d)=\mathrm{max}_f\,R[d,f]$", xy=(kx + 8, drifts[ky]), xytext=(110, -0.9),
+                   fontsize=ANN, color="white", ha="left", va="center", path_effects=HALO,
+                   arrowprops=dict(arrowstyle="-|>", color="white", lw=1.4, shrinkA=2, shrinkB=2))
+    for a, tag in zip(ax, ("(a)", "(b)")):
+        a.tick_params(labelsize=TICK, length=3, width=0.7)
+        a.text(0.0, 1.02, tag, transform=a.transAxes, fontsize=TAG, weight="bold", ha="left", va="bottom")
+    fig.tight_layout(h_pad=1.2)
+    fig.savefig("tex/figs/concept.pdf", bbox_inches="tight", pad_inches=0.02)
+    fig.savefig("tex/figs/concept.png", dpi=450, bbox_inches="tight", pad_inches=0.02); plt.close()
     print("wrote concept.png + .pdf")
 
 
 if __name__ == "__main__":
-    architecture(); concept()
+    # Figure 1 is now the PlotNeuralNet diagram (diagrams/driftnet_arch.py); the matplotlib
+    # architecture() here is superseded and would overwrite it, so it only runs when asked for.
+    for name in (sys.argv[1:] or ["concept"]):
+        globals()[name]()

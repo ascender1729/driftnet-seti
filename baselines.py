@@ -29,15 +29,24 @@ def load(split):
 
 
 # ---------- A) dedoppler matched filter ----------
-def dedoppler_features(img, max_drift=1):
+# Trial-drift grid, in channels per time step. MUST match DriftNet's init grid (driftnet_comprehensive.make:
+# np.linspace(-3, 3, 17)) so the classical baseline and the learned variants share the same de-Doppler
+# front end. The comprehensive injections (+-0.2 / +-0.4 Hz/s at 0.153 Hz/s per ch/step) drift
+# +-1.31 / +-2.61 ch/step, so the earlier +-1 grid (9 points) could not reach them.
+DD_MAX_DRIFT = 3.0
+DD_N_DRIFTS = 17
+
+
+def dedoppler_features(img, max_drift=DD_MAX_DRIFT, n_drifts=DD_N_DRIFTS):
     """Return (drift_score, vertical_score): best mean-subtracted line SNR over drifting vs zero-drift.
-    max_drift is channels-per-row; the injected signals drift 0.15..0.6 ch/step so +-1 covers them."""
+    max_drift is channels-per-row. The grid is np.linspace(-max_drift, max_drift, n_drifts), default
+    linspace(-3, 3, 17) = DriftNet's grid (see DD_MAX_DRIFT / DD_N_DRIFTS above for why)."""
     T, F = img.shape
     # subtract per-TIME-ROW mean across frequency (flattens broadband) - keeps narrowband lines,
     # both drifting AND vertical. (Subtracting the per-CHANNEL time-mean would erase vertical RFI.)
     m = img - img.mean(axis=1, keepdims=True)
     noise = m.std() + 1e-9
-    drifts = np.linspace(-max_drift, max_drift, 9)
+    drifts = np.linspace(-max_drift, max_drift, n_drifts)
     best_drift, best_vert = 0.0, 0.0
     for d in drifts:
         shifts = np.round(d * np.arange(T)).astype(int)
@@ -78,7 +87,8 @@ def run_dedoppler(Xtr, ytr, Xte, yte, snr_te, ids_te):
         p = _dd_classify(dr, ve, thr)
         per[_id] = {"true": CLS[yt], "pred": CLS[p], "snr_db": float(s)}
         correct += int(p == yt)
-    return {"method": "dedoppler", "threshold": float(thr), "acc": correct / len(yte), "per": per}
+    return {"method": "dedoppler", "threshold": float(thr), "margin": 0.0,   # rule: signal iff drift > vert + margin
+            "grid": {"max_drift": DD_MAX_DRIFT, "n": DD_N_DRIFTS}, "acc": correct / len(yte), "per": per}
 
 
 # ---------- B) small CNN ----------

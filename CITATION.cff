@@ -8,7 +8,7 @@ abstract: >-
   ablates each design choice on real Green Bank Telescope noise.
 type: software
 doi: 10.5281/zenodo.21343024
-version: v1.0.0
+version: v1.1.0
 authors:
   - family-names: Dubasi
     given-names: Pavan Kumar

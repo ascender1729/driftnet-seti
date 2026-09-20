@@ -49,7 +49,8 @@ def main():
     od_m = [m for m, _ in od]; od_s = [s for _, s in od]
     ax[0].bar(x - w / 2, in_m, w, yerr=in_s, capsize=3, color=IN_C, label="in-distribution (X-band)")
     ax[0].bar(x + w / 2, od_m, w, yerr=od_s, capsize=3, color=OOD_C, label="OOD mean (L-band cadences)")
-    ax[0].axhline(1 / 3, ls=":", lw=0.9, color="#999"); ax[0].text(len(VARIANTS) - 0.6, 0.35, "chance", fontsize=6.5, color="#999")
+    # majority-class chance: the injection set is 2:1:1 (signal:rfi:noise), so always-"signal" scores 0.5, not 1/3
+    ax[0].axhline(0.5, ls=":", lw=0.9, color="#999"); ax[0].text(len(VARIANTS) - 0.6, 0.515, "majority-class chance", fontsize=6.5, color="#999")
     ax[0].set_xticks(x); ax[0].set_xticklabels([LABEL[v] for v in VARIANTS], fontsize=7.5)
     ax[0].set_ylabel("3-class accuracy"); ax[0].set_ylim(0, 1.02); ax[0].set_title("(a) cross-band robustness", fontsize=9.5)
     ax[0].legend(fontsize=7.5, loc="lower left", framealpha=0.9)

@@ -128,6 +128,8 @@ def main():
     acc = {v: {ts: [] for ts in testsets} for v in variants + ["classical"]}
     pooled = {v: {ts: ([], []) for ts in testsets} for v in variants + ["classical"]}  # (preds, ys)
     mets = {v: {ts: [] for ts in testsets} for v in variants + ["classical"]}  # per-seed (auc,ap,far)
+    learned = {}                                                     # seed -> trained drift grid of "full"
+    init_grid = [float(d) for d in np.linspace(-3, 3, 17)]           # same as make()
     for seed in SEEDS:
         rng = np.random.default_rng(seed); idx = rng.permutation(len(Xtr0)); cut = int(len(Xtr0) * 0.85)
         tri, tei = idx[:cut], idx[cut:]
@@ -140,6 +142,11 @@ def main():
         thr = B.fit_dedoppler(Xtr0[tri], ytr0[tri])
         for v in variants:
             net = train(v, seed, tr, dev)
+            if v == "full":
+                fin = net.drifts.detach().cpu().tolist()
+                learned[seed] = {"final": fin, "init": init_grid,
+                                 "mean_abs_move": float(np.mean(np.abs(np.array(fin) - np.array(init_grid)))),
+                                 "min": float(min(fin)), "max": float(max(fin))}
             for ts, dat in te_local.items():
                 X, y, _ = dat; p, sc = predict(net, X, dev)
                 acc[v][ts].append(float((p == y).mean()))
@@ -155,7 +162,9 @@ def main():
         print(f"seed {seed} done: full in_dist={acc['full']['in_dist'][-1]:.3f} "
               f"ood_mean={np.mean([acc['full'][t][-1] for t in testsets if t.startswith('ood')]):.3f}", flush=True)
 
-    summary = {"seeds": SEEDS, "acc_mean_sd": {}, "det_mean_sd": {}, "mcnemar_bh": {}}
+    summary = {"seeds": SEEDS, "acc_mean_sd": {}, "det_mean_sd": {}, "mcnemar_bh": {},
+               "learned_drifts": learned,
+               "classical_grid": {"max_drift": B.DD_MAX_DRIFT, "n": B.DD_N_DRIFTS}}
     for v in acc:
         summary["acc_mean_sd"][v] = {ts: [round(float(np.mean(a)), 3), round(float(np.std(a)), 3)]
                                      for ts, a in acc[v].items()}
