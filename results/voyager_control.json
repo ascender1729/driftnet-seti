@@ -1,0 +1,59 @@
+{
+ "carrier_mhz": 8419.542730785906,
+ "T": 16,
+ "F": 512,
+ "rho_carrier": 62.279337705143384,
+ "rho_linear": 62.15689332232569,
+ "rho_noise_floor": 0.9560657122505514,
+ "blank_mode": "track",
+ "d_hat_chan_per_samp": 2.4000000000000004,
+ "a_hat_chan_per_samp2": 0.0020000000000000018,
+ "d_hat_hz_s": 0.3673532066774419,
+ "a_hat_hz_s2": 1.6770800697847442e-05,
+ "d_hat_linear_chan_per_samp": 2.4000000000000004,
+ "d_hat_linear_hz_s": 0.3673532066774419,
+ "d_dat_chan_per_samp": 2.3333336538767053,
+ "track_check": {
+  "as_given": {
+   "frac_within": 1.0,
+   "max_abs_resid": 1
+  },
+  "flipped": {
+   "frac_within": 0.0625,
+   "max_abs_resid": 70
+  },
+  "row_argmax": [
+   255,
+   258,
+   261,
+   262,
+   265,
+   267,
+   269,
+   272,
+   274,
+   277,
+   280,
+   282,
+   284,
+   286,
+   289,
+   291
+  ],
+  "sign_ok": true
+ },
+ "a_hat_over_grid_span": 0.050000000000000044,
+ "tsamp_s": 18.253611007999982,
+ "df_hz": 2.7939677238464355,
+ "drift_grid": [
+  -3.0,
+  3.0,
+  61
+ ],
+ "carrier_source": "turboseti_dat",
+ "carrier_chan": 659989,
+ "dat_drift_hz_s": -0.357149,
+ "dat_snr": 192.895111,
+ "on_file": "single_coarse_guppi_59046_80036_DIAG_VOYAGER-1_0011.rawspec.0000.h5",
+ "foff_mhz": -2.7939677238464355e-06
+}

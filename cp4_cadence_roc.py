@@ -181,9 +181,11 @@ def turbo_detect(files, inj_freq_hz, work_dir):
 
 
 # ---------------- DriftNet branch ----------------
-def train_driftnet(cad_dir, dev):
+def train_driftnet(cad_dir, dev, grid_max=2.0):
     """Train DriftNet on single-frame injections (drifting signal / zero-drift rfi / noise) built from
-    the SAME real backgrounds, at the cadence frame size. Returns the trained net."""
+    the SAME real backgrounds, at the cadence frame size. Returns the trained net.
+    grid_max: half-width of the frozen 17-point drift grid in channels per sample (default 2.0 = the
+    paper's model; voyager_realsignal.py also scores a grid_max=3.0 copy that reaches the -2.3 ch/samp carrier)."""
     import torch, torch.nn as nn
     from driftnet_v2 import DriftNetV2, CI
     import h5py
@@ -202,7 +204,7 @@ def train_driftnet(cad_dir, dev):
         arr, _ = inject_line(bg(), float(rng.choice([6, 12, 25])), 0.0); X.append(arr); y.append(CI["rfi"])
         X.append(np.asarray(bg().data, dtype=np.float32)); y.append(CI["noise"])
     X = torch.tensor(np.stack(X)); y = torch.tensor(np.array(y))
-    net = DriftNetV2(list(np.linspace(-2, 2, 17)), learn_drifts=False).to(dev)   # frozen (proven equal)
+    net = DriftNetV2(list(np.linspace(-grid_max, grid_max, 17)), learn_drifts=False).to(dev)   # frozen (proven equal)
     opt = torch.optim.Adam(net.parameters(), lr=1e-3, weight_decay=1e-4); ce = nn.CrossEntropyLoss()
     for e in range(70):
         perm = torch.randperm(len(X))

@@ -1,0 +1,84 @@
+{
+ "cadence": "real_data/cadence",
+ "on_file": "single_coarse_guppi_59046_80036_DIAG_VOYAGER-1_0011.rawspec.0000.h5",
+ "T": 16,
+ "F": 512,
+ "carrier_chan": 659989,
+ "real_carrier_scores": {
+  "signal": 1.0,
+  "rfi": 0.0,
+  "noise": 0.0
+ },
+ "carrier_blanked_scores": {
+  "signal": 0.9914,
+  "rfi": 0.0003,
+  "noise": 0.0083
+ },
+ "pred_real": "signal",
+ "pred_blanked": "signal",
+ "blank_mode": "track",
+ "track_check": {
+  "as_given": {
+   "frac_within": 1.0,
+   "max_abs_resid": 1
+  },
+  "flipped": {
+   "frac_within": 0.0625,
+   "max_abs_resid": 70
+  },
+  "row_argmax": [
+   255,
+   258,
+   261,
+   262,
+   265,
+   267,
+   269,
+   272,
+   274,
+   277,
+   280,
+   282,
+   284,
+   286,
+   289,
+   291
+  ],
+  "sign_ok": true
+ },
+ "carrier_source": "turboseti_dat",
+ "dat_drift_hz_s": -0.357149,
+ "dat_snr": 192.895111,
+ "d_dat_chan_per_samp": 2.3333336538767053,
+ "carrier_mhz": 8419.542730785906,
+ "scores_grid2": {
+  "real_carrier_scores": {
+   "signal": 1.0,
+   "rfi": 0.0,
+   "noise": 0.0
+  },
+  "carrier_blanked_scores": {
+   "signal": 0.9914,
+   "rfi": 0.0003,
+   "noise": 0.0083
+  },
+  "pred_real": "signal",
+  "pred_blanked": "signal",
+  "drift_grid_max": 2.0
+ },
+ "scores_grid3": {
+  "real_carrier_scores": {
+   "signal": 1.0,
+   "rfi": 0.0,
+   "noise": 0.0
+  },
+  "carrier_blanked_scores": {
+   "signal": 1.0,
+   "rfi": 0.0,
+   "noise": 0.0
+  },
+  "pred_real": "signal",
+  "pred_blanked": "signal",
+  "drift_grid_max": 3.0
+ }
+}
